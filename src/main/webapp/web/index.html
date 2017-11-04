@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+<title>搜索</title>
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="http://malsup.github.io/jquery.form.js"></script>
+<script type="text/javascript">
+        function search() {
+            $.ajax({
+                type: "POST",//方法类型
+                dataType: "json",//预期服务器返回的数据类型
+                url: "../appServer/testAction.do" ,//url
+                data: $('#searchform').serialize(),
+                success: function (result) {
+                    console.log(result);//打印服务端返回的数据(调试用)
+                  /*   if (result.resultCode == 200) {
+                         alert("SUCCESS");
+                    } */
+                    $("#list").html('');  
+                    var json = eval(result); //数组         
+                    $.each(json, function (index, item) {  
+                        //循环获取数据    
+                        var fid = json[index].fid;  
+                        var film_name = json[index].film_name;  
+                        var img_url = json[index].img_url; 
+                        var actor = json[index].actor; 	
+                        var sn = json[index].sn; 	
+                        var bt_url = json[index].bt_url; 
+                        var source_url = json[index].source_url;                    
+                        var arrImgs=img_url.split(",");
+                        var Img_html='';
+                      
+                        var btUrlhtml = "<a href=\""+bt_url+"\"  target=\"_blank)\">下载链接</a>";
+                        var sourceUrlhtml = "<a href=\""+source_url+"\"  target=\"_blank)\">来源地址</a>";
+                      //遍历数组插入img标签到页面
+                      for(var i=0;i<arrImgs.length;i++){
+                    	  Img_html+='<img width=400  src="'+arrImgs[i]+'" />';//创建img标签，图片地址赋值src
+                      }
+                        $("#list").html($("#list").html() + "<br>" + film_name +
+                        		"<br>" + Img_html 
+                        		+"<br>"+btUrlhtml
+                        		+"<br>"+sourceUrlhtml
+                        		+"<br/>"
+                        	/* 	+btUrlhtml; */
+                        		);  
+                    });
+                    
+                },
+                error : function() {
+                    alert("异常！");
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+	<form id="searchform" action="##" onsubmit="return false" method="post">
+		<input type="text" name="film_name" id="film_name"
+			placeholder="请输入关键字" /> <input type="button" value="搜索"
+			onclick="search()" />
+	</form>
+	<ul id="list">
+	</ul>
+</body>
+</html>

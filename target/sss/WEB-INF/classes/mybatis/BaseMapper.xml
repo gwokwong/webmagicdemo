@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weigw.sss.dao.BaseDao">
+	<select id="getDbName" resultType="string" parameterType="map">
+		select
+		DATABASE()
+	</select>
+	<select id="getTableInfo" parameterType="map" resultType="map">
+		select
+		t.TABLE_NAME,t.COLUMN_NAME,t.DATA_TYPE from information_schema.columns
+		t
+		where table_schema = #{dbName}
+	</select>
+	<insert id="insertDB" parameterType="map" useGeneratedKeys="true">
+		insert into ${tableName}(
+		<foreach collection="data" item="ele" index="index" separator=",">
+			${ele.col}
+		</foreach>
+		)values(
+		<foreach collection="data" item="ele" index="index" separator=",">
+			#{ele.val}
+		</foreach>
+		)
+		<selectKey keyProperty="id" resultType="int">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	<update id="updateDb" parameterType="map">
+		update ${tableName} set
+		<foreach collection="data" index="index" item="ele" separator=",">
+			${ele.col}=#{ele.val}
+		</foreach>
+		where id=#{id}
+	</update>
+	<delete id="deleteDb" parameterType="map">
+		delete from ${tableName}
+		where id=#{data.id}
+	</delete>
+	<select id="simpleSelect" parameterType="map" resultType="map">
+		select * from ${tableName}
+		<where>
+			<foreach collection="keyList" item="item">
+				and
+				${item.key}=#{item.value}
+			</foreach>
+		</where>
+	</select>
+	<select id="simpleCheckData" parameterType="map" resultType="int">
+		select count(*) from ${tableName}
+		<where>
+			<foreach collection="keyList" item="item">
+				and
+				${item.key}=#{item.value}
+			</foreach>
+		</where>
+	</select>
+	<select id="simpleSelectTable" parameterType="string"
+		resultType="map">
+		select * from ${_parameter}
+	</select>
+	<insert id="insertBatch" parameterType="map">
+		insert into ${tableName}(
+		<foreach collection="col" item="ele" index="index" separator=",">
+			${ele.COLUMN_NAME}
+		</foreach>
+		)values
+		<foreach collection="data" item="ele" index="index" separator=",">
+			(
+			<foreach collection="ele" item="ele1" separator=",">
+				#{ele1.val}
+			</foreach>
+			)
+		</foreach>
+
+	</insert>
+
+	<!-- in条件的查询 -->
+	<select id="simpleSelectTableIn" parameterType="map" resultType="map">
+		select distinct * from ${tableName} where ${columName} in
+		<foreach collection="data" item="it" close=")" separator=","
+			open="(">
+			${it.columValue}
+		</foreach>
+	</select>
+	
+	<!-- like 查询 -->
+	<select id="simpleSelectTableLike" parameterType="map" resultType="map">
+		select distinct * from ${tableName} 
+		<where>
+			<foreach collection="keyList" item="item">
+				and ${item.key} LIKE concat(concat('%',#{item.value}),'%')
+			</foreach>
+		</where>
+	</select>
+
+
+	<delete id="deleteBatch" parameterType="map">
+		delete from ${tableName} where id in
+		<foreach collection="data" item="it" close=")" separator=","
+			open="(">
+			${it.id}
+		</foreach>
+	</delete>
+</mapper>
