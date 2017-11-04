@@ -70,7 +70,6 @@ public class AquFid21 extends AbsAqu1024 {
 				String actorValue = content.substring(actorIndex + 6, content.indexOf("<br>", actorIndex)).replace("&nbsp;", "").replace("\n", "");
 				map.put("actor", actorValue);
 			}
-
 			System.out.println("map--->" + map.toString());
 			bs.insertDB(map, "film");
 		} catch (Exception e) {
