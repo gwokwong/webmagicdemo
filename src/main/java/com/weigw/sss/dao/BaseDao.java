@@ -29,5 +29,4 @@ public interface BaseDao {
 
 	int deleteBatch(Map<String, Object> parMap);
 	
-
 }
